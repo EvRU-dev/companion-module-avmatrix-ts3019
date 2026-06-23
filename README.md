@@ -2,7 +2,7 @@
 
 Bitfocus Companion module for controlling AVMATRIX TS3019 tally lamps through the tally box USB-C serial port.
 
-Current status: beta (`0.1.0-beta.2`).
+Current status: beta (`0.1.0-beta.3`).
 
 The first implementation targets the TS3019 vMix-compatible USB mode, which appears to expose an Arduino/Firmata-style serial tally interface.
 
@@ -18,6 +18,10 @@ corepack yarn build
 ```
 
 Then add the cloned folder as a Companion development/custom module path, or place it inside the Companion extra module directory.
+
+## Official Companion listing
+
+This repository is prepared for submission through the Bitfocus Developer Portal. The module is currently published as a GitHub prerelease while it is tested with real TS3019 hardware and ATEM/vMix trigger workflows.
 
 ## Development
 
