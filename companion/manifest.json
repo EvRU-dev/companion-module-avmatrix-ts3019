@@ -1,0 +1,33 @@
+{
+	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
+	"type": "connection",
+	"id": "avmatrix-ts3019",
+	"name": "AVMATRIX TS3019",
+	"shortname": "TS3019",
+	"description": "Control AVMATRIX TS3019 tally lamps over USB serial",
+	"version": "0.1.0-beta.1",
+	"isPrerelease": true,
+	"license": "MIT",
+	"repository": "git+https://github.com/EvRU-dev/companion-module-avmatrix-ts3019.git",
+	"bugs": "https://github.com/EvRU-dev/companion-module-avmatrix-ts3019/issues",
+	"maintainers": [
+		{
+			"name": "Local development",
+			"email": "local@example.com"
+		}
+	],
+	"runtime": {
+		"type": "node22",
+		"api": "nodejs-ipc",
+		"apiVersion": "0.0.0",
+		"entrypoint": "../dist/main.js",
+		"permissions": {
+			"native-addons": true,
+			"filesystem": true
+		}
+	},
+	"legacyIds": [],
+	"manufacturer": "AVMATRIX",
+	"products": ["TS3019"],
+	"keywords": ["tally", "usb", "serial", "firmata", "vmix"]
+}
