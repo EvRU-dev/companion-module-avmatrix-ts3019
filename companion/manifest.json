@@ -5,7 +5,7 @@
 	"name": "AVMATRIX TS3019",
 	"shortname": "TS3019",
 	"description": "Control AVMATRIX TS3019 tally lamps over USB serial",
-	"version": "0.1.0-beta.1",
+	"version": "0.1.0-beta.2",
 	"isPrerelease": true,
 	"license": "MIT",
 	"repository": "git+https://github.com/EvRU-dev/companion-module-avmatrix-ts3019.git",

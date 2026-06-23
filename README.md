@@ -2,7 +2,7 @@
 
 Bitfocus Companion module for controlling AVMATRIX TS3019 tally lamps through the tally box USB-C serial port.
 
-Current status: beta (`0.1.0-beta.1`).
+Current status: beta (`0.1.0-beta.2`).
 
 The first implementation targets the TS3019 vMix-compatible USB mode, which appears to expose an Arduino/Firmata-style serial tally interface.
 

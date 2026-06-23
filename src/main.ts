@@ -7,6 +7,8 @@ import { UpdateFeedbacks, type FeedbacksSchema } from './feedbacks.js'
 import { UpdatePresets } from './presets.js'
 import { findTs3019Port, Ts3019Connection, type TallyState } from './ts3019.js'
 
+const MAX_LAMPS = 12
+
 export type ModuleSchema = {
 	config: ModuleConfig
 	secrets: undefined
@@ -169,7 +171,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	private getLampCount(): number {
-		return Math.max(1, Math.min(12, Number(this.config.lampCount || 12)))
+		return Math.max(1, Math.min(MAX_LAMPS, Number(this.config.lampCount || MAX_LAMPS)))
 	}
 
 	private async resolvePortPath(configuredPath: string): Promise<string> {
@@ -192,7 +194,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			connected: this.connection?.isOpen ? 'yes' : 'no',
 		}
 
-		for (let lamp = 1; lamp <= this.getLampCount(); lamp++) {
+		for (let lamp = 1; lamp <= MAX_LAMPS; lamp++) {
 			values[`lamp_${lamp}_state`] = this.getLampState(lamp)
 		}
 
