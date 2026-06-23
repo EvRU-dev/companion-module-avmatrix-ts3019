@@ -88,8 +88,9 @@ export class Ts3019Connection {
 		const pins = this.getLampPins(lamp, firstPreviewPin)
 		const preview = state === 'preview' || state === 'both'
 		const program = state === 'program' || state === 'both'
+		const outputPreview = preview && !program
 
-		await this.writeDigitalPin(pins.previewPin, preview)
+		await this.writeDigitalPin(pins.previewPin, outputPreview)
 		await this.writeDigitalPin(pins.programPin, program)
 
 		this.lampStates[lamp - 1] = { preview, program }

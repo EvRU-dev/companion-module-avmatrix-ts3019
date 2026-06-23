@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-beta.5
+
+- Add red-over-green priority for lamps that are both Program and Preview.
+- Preserve logical Preview state when Program is active, so Preview can appear again after Program moves away.
+
 ## 0.1.0-beta.4
 
 - Lazy-load `serialport` so Companion package checks can import the module entrypoint without requiring a native serialport binding at load time.

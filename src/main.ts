@@ -79,8 +79,9 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		if (!this.connection?.isOpen) throw new Error('TS3019 is not connected')
 
 		const firstPreviewPin = Number(this.config.firstPreviewPin ?? 2)
-		const wantsPreview = state === 'preview' || state === 'both'
-		const wantsProgram = state === 'program' || state === 'both'
+		const targetState = this.mergeTargetState(this.connection.getLampState(lamp), state)
+		const wantsPreview = targetState === 'preview' || targetState === 'both'
+		const wantsProgram = targetState === 'program' || targetState === 'both'
 
 		if (mode === 'exclusive' && (wantsPreview || wantsProgram)) {
 			for (let otherLamp = 1; otherLamp <= this.getLampCount(); otherLamp++) {
@@ -98,7 +99,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			}
 		}
 
-		await this.connection.setLamp(lamp, state, firstPreviewPin)
+		await this.connection.setLamp(lamp, targetState, firstPreviewPin)
 		this.updateVariables()
 		this.checkFeedbacks('lamp_state')
 	}
@@ -122,6 +123,15 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		if (state.program) return 'program'
 		if (state.preview) return 'preview'
 		return 'off'
+	}
+
+	private mergeTargetState(current: { preview: boolean; program: boolean }, requested: TallyState): TallyState {
+		if (requested === 'off' || requested === 'both') return requested
+
+		return this.lampStatusToTallyState({
+			preview: current.preview || requested === 'preview',
+			program: current.program || requested === 'program',
+		})
 	}
 
 	private async openConnection(): Promise<void> {

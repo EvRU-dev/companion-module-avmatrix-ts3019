@@ -7,3 +7,4 @@ DEBUG-*
 /.yarn
 /.vscode
 /.codex-ssh
+.DS_Store
