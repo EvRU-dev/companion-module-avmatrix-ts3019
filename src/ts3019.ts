@@ -1,4 +1,5 @@
-import { SerialPort } from 'serialport'
+type SerialPortClass = typeof import('serialport').SerialPort
+type SerialPortInstance = InstanceType<SerialPortClass>
 
 export type TallyState = 'off' | 'preview' | 'program' | 'both'
 
@@ -19,7 +20,7 @@ const DIGITAL_MESSAGE = 0x90
 const OUTPUT = 0x01
 
 export class Ts3019Connection {
-	private port?: SerialPort
+	private port?: SerialPortInstance
 	private portStates = new Map<number, number>()
 	private lampStates: LampStatus[] = []
 
@@ -38,6 +39,7 @@ export class Ts3019Connection {
 		this.portStates.clear()
 		this.lampStates = Array.from({ length: lampCount }, () => ({ preview: false, program: false }))
 
+		const SerialPort = await loadSerialPort()
 		this.port = new SerialPort({
 			path,
 			baudRate,
@@ -143,6 +145,7 @@ export class Ts3019Connection {
 }
 
 export async function findTs3019Port(preferredPath?: string): Promise<SerialDeviceInfo | undefined> {
+	const SerialPort = await loadSerialPort()
 	const ports = await SerialPort.list()
 	const normalizedPreferredPath = preferredPath?.trim()
 
@@ -156,4 +159,9 @@ export async function findTs3019Port(preferredPath?: string): Promise<SerialDevi
 		ports.find((port) => /ch340|ch341|qinheng/i.test(`${port.manufacturer ?? ''} ${port.path}`)) ??
 		ports.find((port) => /ttyUSB|ttyACM|usbserial|usbmodem|^COM\d+$/i.test(port.path))
 	)
+}
+
+async function loadSerialPort(): Promise<SerialPortClass> {
+	const { SerialPort } = await import('serialport')
+	return SerialPort
 }

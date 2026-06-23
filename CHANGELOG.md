@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-beta.4
+
+- Lazy-load `serialport` so Companion package checks can import the module entrypoint without requiring a native serialport binding at load time.
+
 ## 0.1.0-beta.3
 
 - Prepare metadata for Bitfocus Developer Portal submission.
