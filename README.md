@@ -88,4 +88,4 @@ This allows two red program lamps during fades or mix transitions while clearing
 
 The repository includes a portable Companion v4 trigger importer in `examples/atem-ts3019-triggers`.
 
-It can create the full ATEM input 1-12 to TS3019 lamp 1-12 trigger collection on another Companion machine by reading that machine's `db.sqlite` and resolving the local ATEM/TS3019 connection IDs by label.
+It can create the full ATEM input 1-12 to TS3019 lamp 1-12 trigger collection on another Companion machine by reading that machine's `db.sqlite` and resolving the local ATEM/TS3019 connection IDs by label. The example includes Windows, macOS, and Linux/Raspberry launchers and does not require Python.

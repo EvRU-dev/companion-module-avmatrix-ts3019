@@ -1,2 +1,3 @@
 package.json
 /LICENSE.md
+examples/atem-ts3019-triggers/vendor/**

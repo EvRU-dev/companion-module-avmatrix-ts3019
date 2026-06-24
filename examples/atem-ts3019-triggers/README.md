@@ -16,33 +16,60 @@ The TS3019 module should be version `0.1.0-beta.6` or newer, because the trigger
 - Bitfocus Companion v4
 - A connection using the `bmd-atem` module
 - A connection using the `avmatrix-ts3019` module
-- Python 3 on the Companion machine
+- Node.js. The platform launchers try to find the Node runtime bundled with Companion, so a separate Node install is often not needed.
 
 Stop Companion before editing the database.
+
+## Recommended launchers
+
+Use the launcher for the Companion machine:
+
+- Windows: `import-windows.bat`
+- macOS: `import-macos.command`
+- Linux / Raspberry Pi / CompanionPi: `import-linux-raspberry.sh`
+
+The shared importer is `import-atem-ts3019-triggers.mjs`. It uses the vendored `sql.js` SQLite engine in `vendor/sql.js`, so Python is not required.
 
 ## Raspberry Pi / CompanionPi
 
 ```sh
-sudo systemctl stop companion.service
-sudo python3 import-atem-ts3019-triggers.py \
-  --db /home/companion/.config/companion-nodejs/v4.3/db.sqlite \
-  --atem-label atem \
-  --ts3019-label TS3019
-sudo systemctl start companion.service
+chmod +x import-linux-raspberry.sh
+./import-linux-raspberry.sh
 ```
 
-## macOS / Windows
+The Linux/Raspberry launcher stops and starts `companion.service` automatically when that service exists.
 
-Find the Companion v4 `db.sqlite` file, stop Companion, then run:
+## macOS
 
 ```sh
-python3 import-atem-ts3019-triggers.py --db /path/to/db.sqlite --atem-label atem --ts3019-label TS3019
+./import-macos.command
 ```
 
-On Windows, use the real path to `db.sqlite`, for example:
+If macOS blocks the command file, allow it in System Settings or run:
+
+```sh
+chmod +x import-macos.command
+./import-macos.command
+```
+
+## Windows
+
+Stop Companion, then run:
 
 ```bat
-py import-atem-ts3019-triggers.py --db "C:\Path\To\db.sqlite" --atem-label atem --ts3019-label TS3019
+import-windows.bat
+```
+
+You can also drag `db.sqlite` onto `import-windows.bat`, or pass the path explicitly:
+
+```bat
+import-windows.bat "C:\Path\To\db.sqlite"
+```
+
+## Manual Node command
+
+```sh
+node import-atem-ts3019-triggers.mjs --db /path/to/db.sqlite --atem-label atem --ts3019-label TS3019
 ```
 
 ## Options
