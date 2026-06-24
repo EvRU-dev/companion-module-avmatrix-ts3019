@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-beta.6
+
+- Add action states for clearing only Preview or only Program tally on a lamp.
+- Support ATEM tally triggers that independently follow Program and Preview true/false states.
+
 ## 0.1.0-beta.5
 
 - Add red-over-green priority for lamps that are both Program and Preview.

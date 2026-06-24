@@ -2,7 +2,7 @@ import { InstanceBase, InstanceStatus, type SomeCompanionConfigField } from '@co
 import { GetConfigFields, type ModuleConfig } from './config.js'
 import { UpdateVariableDefinitions, type VariablesSchema } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
-import { UpdateActions, type ActionsSchema, type TallySetMode } from './actions.js'
+import { UpdateActions, type ActionsSchema, type TallyActionState, type TallySetMode } from './actions.js'
 import { UpdateFeedbacks, type FeedbacksSchema } from './feedbacks.js'
 import { UpdatePresets } from './presets.js'
 import { findTs3019Port, Ts3019Connection, type TallyState } from './ts3019.js'
@@ -75,7 +75,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		UpdateVariableDefinitions(this)
 	}
 
-	async setLamp(lamp: number, state: TallyState, mode: TallySetMode = 'exclusive'): Promise<void> {
+	async setLamp(lamp: number, state: TallyActionState, mode: TallySetMode = 'exclusive'): Promise<void> {
 		if (!this.connection?.isOpen) throw new Error('TS3019 is not connected')
 
 		const firstPreviewPin = Number(this.config.firstPreviewPin ?? 2)
@@ -125,8 +125,14 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		return 'off'
 	}
 
-	private mergeTargetState(current: { preview: boolean; program: boolean }, requested: TallyState): TallyState {
+	private mergeTargetState(current: { preview: boolean; program: boolean }, requested: TallyActionState): TallyState {
 		if (requested === 'off' || requested === 'both') return requested
+		if (requested === 'clear_preview') {
+			return this.lampStatusToTallyState({ preview: false, program: current.program })
+		}
+		if (requested === 'clear_program') {
+			return this.lampStatusToTallyState({ preview: current.preview, program: false })
+		}
 
 		return this.lampStatusToTallyState({
 			preview: current.preview || requested === 'preview',

@@ -2,7 +2,7 @@
 
 Bitfocus Companion module for controlling AVMATRIX TS3019 tally lamps through the tally box USB-C serial port.
 
-Current status: beta (`0.1.0-beta.5`).
+Current status: beta (`0.1.0-beta.6`).
 
 The first implementation targets the TS3019 vMix-compatible USB mode, which appears to expose an Arduino/Firmata-style serial tally interface.
 
@@ -70,14 +70,16 @@ On the TS3019 tally box, set USB-C as the input interface and set the USB-C inte
 
 Create triggers from your switcher module, such as Blackmagic ATEM, and call this module's `Set lamp state` action.
 
-For normal tally updates, use `Exclusive` mode:
+For simple one-at-a-time tally updates, use `Exclusive` mode:
 
 - Program input 1 -> Lamp 1 Program, Exclusive
 - Preview input 2 -> Lamp 2 Preview, Exclusive
 
-For fades or mix transitions where two sources are live at once, use `Additive / transition` mode when the transition starts:
+For ATEM tally, use the ATEM `Tally: Program` and `Tally: Preview` feedbacks as trigger conditions for each input/lamp pair:
 
-- Transition started -> Preview lamp Program, Additive / transition
-- Transition completed -> final Program lamp Program, Exclusive
+- Program tally becomes true -> Lamp N Program, Additive / transition
+- Program tally becomes false -> Lamp N Clear Program only, Additive / transition
+- Preview tally becomes true -> Lamp N Preview, Additive / transition
+- Preview tally becomes false -> Lamp N Clear Preview only, Additive / transition
 
-This allows two red program lamps during the transition while returning to one red program lamp when the transition is complete.
+This allows two red program lamps during fades or mix transitions while clearing the old Program lamp when ATEM reports that it is no longer on air. If a lamp is both Program and Preview, the red output has priority over green on the physical TS3019 output.

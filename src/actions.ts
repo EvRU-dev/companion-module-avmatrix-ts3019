@@ -2,12 +2,13 @@ import type ModuleInstance from './main.js'
 import type { TallyState } from './ts3019.js'
 
 export type TallySetMode = 'exclusive' | 'additive'
+export type TallyActionState = TallyState | 'clear_preview' | 'clear_program'
 
 export type ActionsSchema = {
 	set_lamp: {
 		options: {
 			lamp: number
-			state: TallyState
+			state: TallyActionState
 			mode: TallySetMode
 		}
 	}
@@ -21,6 +22,8 @@ const stateChoices = [
 	{ id: 'preview', label: 'Preview (green)' },
 	{ id: 'program', label: 'Program (red)' },
 	{ id: 'both', label: 'Preview + Program' },
+	{ id: 'clear_preview', label: 'Clear Preview only' },
+	{ id: 'clear_program', label: 'Clear Program only' },
 ]
 
 const modeChoices = [
