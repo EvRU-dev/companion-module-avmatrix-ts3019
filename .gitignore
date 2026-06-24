@@ -8,3 +8,6 @@ DEBUG-*
 /.vscode
 /.codex-ssh
 .DS_Store
+
+__pycache__/
+*.pyc

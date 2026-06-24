@@ -1,0 +1,36 @@
+{
+	"name": "ATEM to TS3019",
+	"description": "Portable description of the ATEM input 1-12 to AVMATRIX TS3019 lamp 1-12 trigger workflow.",
+	"requires": {
+		"companion": "v4",
+		"atemModuleId": "bmd-atem",
+		"ts3019ModuleId": "avmatrix-ts3019",
+		"ts3019Version": "0.1.0-beta.6 or newer"
+	},
+	"defaultLabels": {
+		"atem": "atem",
+		"ts3019": "TS3019"
+	},
+	"mapping": {
+		"inputToLamp": "ATEM input N maps to TS3019 lamp N",
+		"lampCount": 12,
+		"triggersPerLamp": [
+			{
+				"condition": "ATEM Tally: Program for input N becomes true",
+				"action": "TS3019 Set lamp state, lamp N, Program, Additive / transition"
+			},
+			{
+				"condition": "ATEM Tally: Program for input N becomes false",
+				"action": "TS3019 Set lamp state, lamp N, Clear Program only, Additive / transition"
+			},
+			{
+				"condition": "ATEM Tally: Preview for input N becomes true",
+				"action": "TS3019 Set lamp state, lamp N, Preview, Additive / transition"
+			},
+			{
+				"condition": "ATEM Tally: Preview for input N becomes false",
+				"action": "TS3019 Set lamp state, lamp N, Clear Preview only, Additive / transition"
+			}
+		]
+	}
+}

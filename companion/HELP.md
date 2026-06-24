@@ -27,15 +27,19 @@ Connect the tally box to the Companion machine by USB-C. On Raspberry Pi the dev
 
 ## ATEM trigger example
 
-Use Exclusive mode for normal Program and Preview changes:
+Use Exclusive mode for simple one-at-a-time Program and Preview changes:
 
 - ATEM Program input 1 -> Lamp 1 Program, Exclusive
 - ATEM Preview input 2 -> Lamp 2 Preview, Exclusive
 
-For a fade/mix transition where both sources are live during the transition, use Additive / transition mode on transition start:
+For ATEM tally, use the ATEM `Tally: Program` and `Tally: Preview` feedbacks as trigger conditions for each input/lamp pair:
 
-- ATEM transition started -> current Preview lamp Program, Additive / transition
-- ATEM transition completed -> final Program lamp Program, Exclusive
+- Program tally becomes true -> Lamp N Program, Additive / transition
+- Program tally becomes false -> Lamp N Clear Program only, Additive / transition
+- Preview tally becomes true -> Lamp N Preview, Additive / transition
+- Preview tally becomes false -> Lamp N Clear Preview only, Additive / transition
+
+The repository includes an importable Companion v4 example in `examples/atem-ts3019-triggers`.
 
 ## Variables
 

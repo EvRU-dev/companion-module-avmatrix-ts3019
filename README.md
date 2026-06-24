@@ -83,3 +83,9 @@ For ATEM tally, use the ATEM `Tally: Program` and `Tally: Preview` feedbacks as 
 - Preview tally becomes false -> Lamp N Clear Preview only, Additive / transition
 
 This allows two red program lamps during fades or mix transitions while clearing the old Program lamp when ATEM reports that it is no longer on air. If a lamp is both Program and Preview, the red output has priority over green on the physical TS3019 output.
+
+### Importable ATEM trigger example
+
+The repository includes a portable Companion v4 trigger importer in `examples/atem-ts3019-triggers`.
+
+It can create the full ATEM input 1-12 to TS3019 lamp 1-12 trigger collection on another Companion machine by reading that machine's `db.sqlite` and resolving the local ATEM/TS3019 connection IDs by label.
