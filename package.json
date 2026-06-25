@@ -1,12 +1,12 @@
 {
 	"name": "companion-module-avmatrix-ts3019",
-	"version": "0.1.0-beta.6",
+	"version": "0.1.0-beta.7",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
 		"postinstall": "husky",
 		"format": "prettier -w .",
-		"package": "run build && companion-module-build",
+		"package": "run build && companion-module-build --prerelease",
 		"build": "rimraf dist && run build:main",
 		"build:main": "tsc -p tsconfig.build.json",
 		"dev": "tsc -p tsconfig.build.json --watch",

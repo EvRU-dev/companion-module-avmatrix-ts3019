@@ -9,7 +9,7 @@ It creates 48 triggers:
 - ATEM input 1-12 Preview tally on -> TS3019 lamp 1-12 Preview
 - ATEM input 1-12 Preview tally off -> TS3019 lamp 1-12 Clear Preview only
 
-The TS3019 module should be version `0.1.0-beta.6` or newer, because the triggers use the `Clear Program only` and `Clear Preview only` action states.
+The TS3019 module should be version `0.1.0-beta.7` or newer. Version `0.1.0-beta.7` packages the serial dependency needed for imported module packages on Windows, macOS, Linux, and Raspberry Pi.
 
 ## Requirements
 

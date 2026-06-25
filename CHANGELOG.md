@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-beta.7
+
+- Package `serialport` as an external dependency so imported module packages work across Windows, macOS, Linux, and Raspberry Pi.
+
 ## 0.1.0-beta.6
 
 - Add action states for clearing only Preview or only Program tally on a lamp.
