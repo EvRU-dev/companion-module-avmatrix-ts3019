@@ -16,7 +16,7 @@ The TS3019 module should be version `0.1.0-beta.7` or newer. Version `0.1.0-beta
 - Bitfocus Companion v4
 - A connection using the `bmd-atem` module
 - A connection using the `avmatrix-ts3019` module
-- Node.js. The platform launchers try to find the Node runtime bundled with Companion, so a separate Node install is often not needed.
+- No separate Python or Node.js install is required. The platform launchers try to find the Node runtime bundled with Companion.
 
 Stop Companion before editing the database.
 
@@ -29,6 +29,8 @@ Use the launcher for the Companion machine:
 - Linux / Raspberry Pi / CompanionPi: `import-linux-raspberry.sh`
 
 The shared importer is `import-atem-ts3019-triggers.mjs`. It uses the vendored `sql.js` SQLite engine in `vendor/sql.js`, so Python is not required.
+
+For a short user-facing checklist, see `README.txt` in this folder.
 
 ## Raspberry Pi / CompanionPi
 

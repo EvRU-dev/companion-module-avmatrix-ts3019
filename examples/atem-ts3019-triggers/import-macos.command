@@ -29,10 +29,29 @@ elif [ -x "/Applications/Companion.app/Contents/Resources/node-runtimes/node22/b
   NODE_BIN="/Applications/Companion.app/Contents/Resources/node-runtimes/node22/bin/node"
 elif [ -x "/Applications/Bitfocus Companion.app/Contents/Resources/node-runtimes/node22/bin/node" ]; then
   NODE_BIN="/Applications/Bitfocus Companion.app/Contents/Resources/node-runtimes/node22/bin/node"
+else
+  NODE_BIN=$(
+    find /Applications "$HOME/Applications" -path '*Companion*.app*' -type f -name node 2>/dev/null | head -n 1 || true
+  )
 fi
 
 if [ -z "$NODE_BIN" ]; then
-  printf '\nNode.js was not found. Install Node.js or run this importer using Companion'\''s bundled Node runtime.\n'
+  printf '\nCompanion bundled Node runtime was not found automatically.\n'
+  printf 'You do not need to install Node.js.\n'
+  printf 'Paste the path to Companion.app or directly to the bundled node file.\n> '
+  read NODE_HINT
+  if [ -n "$NODE_HINT" ]; then
+    if [ -x "$NODE_HINT" ] && [ "$(basename "$NODE_HINT")" = "node" ]; then
+      NODE_BIN="$NODE_HINT"
+    elif [ -d "$NODE_HINT" ]; then
+      NODE_BIN=$(find "$NODE_HINT" -type f -name node 2>/dev/null | head -n 1 || true)
+    fi
+  fi
+fi
+
+if [ -z "$NODE_BIN" ]; then
+  printf '\nCould not find Companion bundled Node runtime. Nothing was changed.\n'
+  printf 'See README.txt in this folder for what to check.\n'
   printf '\nPress Enter to exit.'
   read _
   exit 1

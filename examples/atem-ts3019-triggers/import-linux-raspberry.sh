@@ -17,10 +17,29 @@ elif [ -x "/opt/companion/node-runtimes/node22/bin/node" ]; then
   NODE_BIN="/opt/companion/node-runtimes/node22/bin/node"
 elif [ -x "/opt/companion/node-runtimes/main/bin/node" ]; then
   NODE_BIN="/opt/companion/node-runtimes/main/bin/node"
+else
+  NODE_BIN=$(
+    find /opt /usr/local -path '*companion*' -type f -name node 2>/dev/null | head -n 1 || true
+  )
 fi
 
 if [ -z "$NODE_BIN" ]; then
-  printf 'Node.js was not found. Install Node.js or run this importer using Companion'\''s bundled Node runtime.\n'
+  printf 'Companion bundled Node runtime was not found automatically.\n'
+  printf 'You do not need to install Node.js.\n'
+  printf 'Paste the path to the Companion install folder, or directly to the bundled node file.\n> '
+  read NODE_HINT
+  if [ -n "$NODE_HINT" ]; then
+    if [ -x "$NODE_HINT" ] && [ "$(basename "$NODE_HINT")" = "node" ]; then
+      NODE_BIN="$NODE_HINT"
+    elif [ -d "$NODE_HINT" ]; then
+      NODE_BIN=$(find "$NODE_HINT" -type f -name node 2>/dev/null | head -n 1 || true)
+    fi
+  fi
+fi
+
+if [ -z "$NODE_BIN" ]; then
+  printf 'Could not find Companion bundled Node runtime. Nothing was changed.\n'
+  printf 'See README.txt in this folder for what to check.\n'
   exit 1
 fi
 
