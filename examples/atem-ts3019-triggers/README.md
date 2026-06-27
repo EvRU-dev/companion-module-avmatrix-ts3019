@@ -10,7 +10,7 @@ It creates 60 triggers for the default 12-lamp setup:
 - ATEM input 1-12 Preview off -> TS3019 lamp 1-12 Clear Preview only
 - ATEM input 1-12 Preview on + Transition running -> TS3019 lamp 1-12 temporary Program
 
-The TS3019 module should be version `0.1.0-beta.9` or newer. Version `0.1.0-beta.9` packages the serial dependency needed for imported module packages on Windows, macOS, Linux, and Raspberry Pi.
+The TS3019 module should be version `0.1.0-beta.10` or newer. Version `0.1.0-beta.10` packages the serial and ATEM sync dependencies needed for imported module packages on Windows, macOS, Linux, and Raspberry Pi.
 
 ## Requirements
 

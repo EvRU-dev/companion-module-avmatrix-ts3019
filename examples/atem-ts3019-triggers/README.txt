@@ -18,7 +18,7 @@ What to install first
 ---------------------
 
 1. Install the AVMATRIX TS3019 module package in Companion:
-   avmatrix-ts3019-0.1.0-beta.9.tgz
+   avmatrix-ts3019-0.1.0-beta.10.tgz
 
 2. In Companion, create/configure these connections:
    - ATEM connection label: atem

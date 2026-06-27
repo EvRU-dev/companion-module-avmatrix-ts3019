@@ -2,7 +2,7 @@
 
 Bitfocus Companion module for controlling AVMATRIX TS3019 tally lamps through the tally box USB-C serial port.
 
-Current status: beta (`0.1.0-beta.9`).
+Current status: beta (`0.1.0-beta.10`).
 
 The first implementation targets the TS3019 vMix-compatible USB mode, which appears to expose an Arduino/Firmata-style serial tally interface.
 
@@ -67,6 +67,19 @@ Typical settings:
 On the TS3019 tally box, set USB-C as the input interface and set the USB-C interface to working mode.
 
 ## Companion trigger workflow
+
+For Blackmagic ATEM, the recommended workflow is now direct ATEM sync inside this TS3019 module. Enable `Enable direct ATEM sync`, set the ATEM IP address, and set `ATEM M/E` to the mix effect you want to follow.
+
+Direct ATEM sync reads Program, Preview, and transition state from the ATEM and recalculates all TS3019 lamps as one complete state update:
+
+- Program input N -> Lamp N red
+- Preview input N -> Lamp N green
+- During fade/mix transition, Preview input N also becomes red
+- After CUT or transition completion, all lamps are normalized from current ATEM Program/Preview state
+
+This avoids race conditions from multiple independent Companion triggers.
+
+The trigger workflow below is kept as a portable fallback.
 
 Create triggers from your switcher module, such as Blackmagic ATEM, and call this module's `Set lamp state` action.
 

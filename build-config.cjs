@@ -1,3 +1,3 @@
 module.exports = {
-	externals: ['serialport'],
+	externals: ['serialport', 'atem-connection'],
 }

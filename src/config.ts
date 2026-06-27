@@ -6,6 +6,10 @@ export type ModuleConfig = {
 	lampCount: number
 	firstPreviewPin: number
 	reconnectInterval: number
+	atemSyncEnabled: boolean
+	atemHost: string
+	atemMixEffect: number
+	atemReconnectInterval: number
 }
 
 export function GetConfigFields(): SomeCompanionConfigField[] {
@@ -52,6 +56,38 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 			min: 0,
 			max: 60000,
 			default: 15000,
+		},
+		{
+			type: 'checkbox',
+			id: 'atemSyncEnabled',
+			label: 'Enable direct ATEM sync',
+			width: 4,
+			default: false,
+		},
+		{
+			type: 'textinput',
+			id: 'atemHost',
+			label: 'ATEM IP address',
+			width: 4,
+			default: '',
+		},
+		{
+			type: 'number',
+			id: 'atemMixEffect',
+			label: 'ATEM M/E',
+			width: 4,
+			min: 1,
+			max: 4,
+			default: 1,
+		},
+		{
+			type: 'number',
+			id: 'atemReconnectInterval',
+			label: 'ATEM reconnect interval (ms)',
+			width: 4,
+			min: 0,
+			max: 60000,
+			default: 5000,
 		},
 	]
 }

@@ -1,6 +1,6 @@
 {
 	"name": "companion-module-avmatrix-ts3019",
-	"version": "0.1.0-beta.9",
+	"version": "0.1.0-beta.10",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
@@ -24,6 +24,7 @@
 	},
 	"dependencies": {
 		"@companion-module/base": "2.0.4",
+		"atem-connection": "^3.6.0",
 		"serialport": "^13.0.0"
 	},
 	"devDependencies": {
