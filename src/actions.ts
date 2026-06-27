@@ -12,6 +12,13 @@ export type ActionsSchema = {
 			mode: TallySetMode
 		}
 	}
+	sync_program_preview: {
+		options: {
+			programInput: number
+			previewInput: number
+			transitionActive: boolean
+		}
+	}
 	clear_all: {
 		options: Record<string, never>
 	}
@@ -61,6 +68,50 @@ export function UpdateActions(self: ModuleInstance): void {
 			],
 			callback: async (event) => {
 				await self.setLamp(Number(event.options.lamp), event.options.state, event.options.mode)
+			},
+		},
+		sync_program_preview: {
+			name: 'Sync all lamps from Program/Preview variables',
+			description:
+				'Set all lamps from switcher Program/Preview input IDs. Use expressions such as $(atem:pgm1_input_id), $(atem:pvw1_input_id), and $(atem:tbar_1) > 0.',
+			options: [
+				{
+					id: 'programInput',
+					type: 'number',
+					label: 'Program input ID',
+					default: 1,
+					min: 0,
+					max: 9999,
+					asInteger: true,
+					allowInvalidValues: true,
+					expressionDescription: 'Use an expression such as $(atem:pgm1_input_id).',
+				},
+				{
+					id: 'previewInput',
+					type: 'number',
+					label: 'Preview input ID',
+					default: 2,
+					min: 0,
+					max: 9999,
+					asInteger: true,
+					allowInvalidValues: true,
+					expressionDescription: 'Use an expression such as $(atem:pvw1_input_id).',
+				},
+				{
+					id: 'transitionActive',
+					type: 'checkbox',
+					label: 'Transition active',
+					default: false,
+					allowInvalidValues: true,
+					expressionDescription: 'Use an expression such as $(atem:tbar_1) > 0.',
+				},
+			],
+			callback: async (event) => {
+				await self.syncProgramPreviewInputs(
+					event.options.programInput,
+					event.options.previewInput,
+					event.options.transitionActive,
+				)
 			},
 		},
 		clear_all: {

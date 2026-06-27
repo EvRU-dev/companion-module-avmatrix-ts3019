@@ -1,11 +1,11 @@
 {
 	"name": "ATEM to TS3019",
-	"description": "Portable description of the ATEM input 1-12 to AVMATRIX TS3019 lamp 1-12 trigger workflow.",
+	"description": "Portable description of the ATEM Program/Preview variable sync workflow for AVMATRIX TS3019 lamps.",
 	"requires": {
 		"companion": "v4",
 		"atemModuleId": "bmd-atem",
 		"ts3019ModuleId": "avmatrix-ts3019",
-		"ts3019Version": "0.1.0-beta.10 or newer"
+		"ts3019Version": "0.1.0-beta.11 or newer"
 	},
 	"defaultLabels": {
 		"atem": "atem",
@@ -14,26 +14,26 @@
 	"mapping": {
 		"inputToLamp": "ATEM input N maps to TS3019 lamp N",
 		"lampCount": 12,
-		"triggersPerLamp": [
+		"triggerGroups": [
 			{
 				"condition": "ATEM ME1 Program source for input N becomes true",
-				"action": "TS3019 Set lamp state, lamp N, Program, Additive / transition"
+				"action": "TS3019 Sync all lamps from Program/Preview variables"
 			},
 			{
 				"condition": "ATEM ME1 Program source for input N becomes false",
-				"action": "TS3019 Set lamp state, lamp N, Clear Program only, Additive / transition"
+				"action": "TS3019 Sync all lamps from Program/Preview variables"
 			},
 			{
 				"condition": "ATEM ME1 Preview source for input N becomes true",
-				"action": "TS3019 Set lamp state, lamp N, Preview, Additive / transition"
+				"action": "TS3019 Sync all lamps from Program/Preview variables"
 			},
 			{
 				"condition": "ATEM ME1 Preview source for input N becomes false",
-				"action": "TS3019 Set lamp state, lamp N, Clear Preview only, Additive / transition"
+				"action": "TS3019 Sync all lamps from Program/Preview variables"
 			},
 			{
-				"condition": "ATEM ME1 Preview source for input N is true and Transition: Active/Running is true",
-				"action": "TS3019 Set lamp state, lamp N, Program, Additive / transition"
+				"condition": "ATEM ME1 Transition: Active/Running changes",
+				"action": "TS3019 Sync all lamps from Program/Preview variables"
 			}
 		]
 	}

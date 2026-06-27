@@ -6,7 +6,6 @@ import { UpdateActions, type ActionsSchema, type TallyActionState, type TallySet
 import { UpdateFeedbacks, type FeedbacksSchema } from './feedbacks.js'
 import { UpdatePresets } from './presets.js'
 import { findTs3019Port, Ts3019Connection, type TallyState } from './ts3019.js'
-import { Atem } from 'atem-connection'
 
 const MAX_LAMPS = 12
 
@@ -23,12 +22,7 @@ export { UpgradeScripts }
 export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	config!: ModuleConfig // Setup in init()
 	private connection?: Ts3019Connection
-	private atem?: Atem
 	private reconnectTimer?: NodeJS.Timeout
-	private atemReconnectTimer?: NodeJS.Timeout
-	private atemSyncTimer?: NodeJS.Timeout
-	private atemPollTimer?: NodeJS.Timeout
-	private atemConnected = false
 
 	constructor(internal: unknown) {
 		super(internal)
@@ -46,13 +40,11 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.updateVariables()
 
 		await this.openConnection()
-		this.setupAtemSync()
 	}
 	// When module gets deleted
 	async destroy(): Promise<void> {
 		this.log('debug', 'destroy')
 		this.stopReconnectTimer()
-		this.stopAtemSync()
 		await this.connection?.close()
 	}
 
@@ -60,7 +52,6 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.config = config
 		this.updateVariables()
 		await this.openConnection()
-		this.setupAtemSync()
 	}
 
 	// Return config fields for web config
@@ -121,23 +112,21 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.checkFeedbacks('lamp_state')
 	}
 
-	async syncFromAtemState(): Promise<void> {
-		if (!this.connection?.isOpen) return
-		if (!this.config.atemSyncEnabled || !this.atemConnected) return
+	async syncProgramPreviewInputs(
+		programInput: unknown,
+		previewInput: unknown,
+		transitionActive: unknown,
+	): Promise<void> {
+		if (!this.connection?.isOpen) throw new Error('TS3019 is not connected')
 
-		const meIndex = Math.max(0, Number(this.config.atemMixEffect || 1) - 1)
-		const state = this.atem?.state
-		const me = state?.video?.mixEffects?.[meIndex]
-		if (!me) return
-
-		const programInput = Number(me.programInput)
-		const previewInput = Number(me.previewInput)
-		const inTransition = !!me.transitionPosition?.inTransition
+		const programId = this.parseInputId(programInput)
+		const previewId = this.parseInputId(previewInput)
+		const isTransitionActive = this.parseBoolean(transitionActive)
 		const firstPreviewPin = Number(this.config.firstPreviewPin ?? 2)
 
 		for (let lamp = 1; lamp <= this.getLampCount(); lamp++) {
-			const wantsProgram = programInput === lamp || (inTransition && previewInput === lamp)
-			const wantsPreview = previewInput === lamp
+			const wantsProgram = programId === lamp || (isTransitionActive && previewId === lamp)
+			const wantsPreview = previewId === lamp
 			const nextState = this.lampStatusToTallyState({ preview: wantsPreview, program: wantsProgram })
 			if (this.getLampState(lamp) !== nextState) {
 				await this.connection.setLamp(lamp, nextState, firstPreviewPin)
@@ -159,6 +148,25 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		if (state.program) return 'program'
 		if (state.preview) return 'preview'
 		return 'off'
+	}
+
+	private parseInputId(value: unknown): number {
+		if (typeof value === 'number') return Number.isFinite(value) ? Math.trunc(value) : 0
+		if (typeof value === 'string') {
+			const parsed = Number(value.trim())
+			return Number.isFinite(parsed) ? Math.trunc(parsed) : 0
+		}
+		return 0
+	}
+
+	private parseBoolean(value: unknown): boolean {
+		if (typeof value === 'boolean') return value
+		if (typeof value === 'number') return value !== 0
+		if (typeof value === 'string') {
+			const normalized = value.trim().toLowerCase()
+			return normalized === 'true' || normalized === 'yes' || normalized === 'on' || normalized === '1'
+		}
+		return false
 	}
 
 	private mergeTargetState(current: { preview: boolean; program: boolean }, requested: TallyActionState): TallyState {
@@ -222,129 +230,6 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		}
 	}
 
-	private setupAtemSync(): void {
-		this.stopAtemSync()
-
-		if (!this.config.atemSyncEnabled) return
-
-		const host = String(this.config.atemHost || '').trim()
-		if (!host) {
-			this.log('warn', 'ATEM sync is enabled, but no ATEM IP address is configured')
-			return
-		}
-
-		this.atem = new Atem()
-		this.atem.on('connected', () => {
-			this.atemConnected = true
-			this.log('info', `Connected to ATEM for direct tally sync at ${host}`)
-			this.startAtemPollTimer()
-			this.scheduleAtemStateSync()
-		})
-		this.atem.on('disconnected', () => {
-			this.atemConnected = false
-			this.stopAtemPollTimer()
-			this.log('warn', 'ATEM direct tally sync disconnected')
-			this.scheduleAtemReconnect()
-		})
-		this.atem.on('stateChanged', (_state, paths) => {
-			const meIndex = Math.max(0, Number(this.config.atemMixEffect || 1) - 1)
-			const prefix = `video.mixEffects.${meIndex}.`
-			if (
-				paths.some(
-					(path) =>
-						path.startsWith(`${prefix}programInput`) ||
-						path.startsWith(`${prefix}previewInput`) ||
-						path.startsWith(`${prefix}transitionPosition`),
-				)
-			) {
-				this.scheduleAtemStateSync()
-			}
-		})
-		this.atem.on('error', (error: unknown) => {
-			const message = error instanceof Error ? error.message : String(error)
-			this.log('warn', `ATEM direct tally sync error: ${message}`)
-		})
-
-		void this.connectAtem()
-	}
-
-	private stopAtemSync(): void {
-		this.stopAtemReconnectTimer()
-		this.stopAtemSyncTimer()
-		this.stopAtemPollTimer()
-		this.atemConnected = false
-
-		const atem = this.atem
-		this.atem = undefined
-		if (atem) {
-			atem.removeAllListeners()
-			void atem.disconnect().catch(() => undefined)
-		}
-	}
-
-	private async connectAtem(): Promise<void> {
-		const host = String(this.config.atemHost || '').trim()
-		if (!this.atem || !host || !this.config.atemSyncEnabled) return
-
-		try {
-			this.log('info', `Connecting to ATEM for direct tally sync at ${host}`)
-			await this.atem.connect(host)
-		} catch (error) {
-			const message = error instanceof Error ? error.message : String(error)
-			this.log('warn', `Could not connect to ATEM ${host}: ${message}`)
-			this.scheduleAtemReconnect()
-		}
-	}
-
-	private scheduleAtemReconnect(): void {
-		this.stopAtemReconnectTimer()
-
-		const interval = Number(this.config.atemReconnectInterval ?? 5000)
-		if (interval <= 0 || !this.config.atemSyncEnabled) return
-
-		this.atemReconnectTimer = setTimeout(() => {
-			void this.connectAtem()
-		}, interval)
-	}
-
-	private stopAtemReconnectTimer(): void {
-		if (this.atemReconnectTimer) {
-			clearTimeout(this.atemReconnectTimer)
-			this.atemReconnectTimer = undefined
-		}
-	}
-
-	private scheduleAtemStateSync(): void {
-		this.stopAtemSyncTimer()
-		this.atemSyncTimer = setTimeout(() => {
-			void this.syncFromAtemState().catch((error) => {
-				const message = error instanceof Error ? error.message : String(error)
-				this.log('warn', `ATEM tally sync failed: ${message}`)
-			})
-		}, 20)
-	}
-
-	private stopAtemSyncTimer(): void {
-		if (this.atemSyncTimer) {
-			clearTimeout(this.atemSyncTimer)
-			this.atemSyncTimer = undefined
-		}
-	}
-
-	private startAtemPollTimer(): void {
-		this.stopAtemPollTimer()
-		this.atemPollTimer = setInterval(() => {
-			this.scheduleAtemStateSync()
-		}, 250)
-	}
-
-	private stopAtemPollTimer(): void {
-		if (this.atemPollTimer) {
-			clearInterval(this.atemPollTimer)
-			this.atemPollTimer = undefined
-		}
-	}
-
 	private getLampCount(): number {
 		return Math.max(1, Math.min(MAX_LAMPS, Number(this.config.lampCount || MAX_LAMPS)))
 	}
@@ -367,7 +252,6 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	private updateVariables(): void {
 		const values: Record<string, string> = {
 			connected: this.connection?.isOpen ? 'yes' : 'no',
-			atem_connected: this.atemConnected ? 'yes' : 'no',
 		}
 
 		for (let lamp = 1; lamp <= MAX_LAMPS; lamp++) {

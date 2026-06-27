@@ -2,7 +2,7 @@
 
 Bitfocus Companion module for controlling AVMATRIX TS3019 tally lamps through the tally box USB-C serial port.
 
-Current status: beta (`0.1.0-beta.10`).
+Current status: beta (`0.1.0-beta.11`).
 
 The first implementation targets the TS3019 vMix-compatible USB mode, which appears to expose an Arduino/Firmata-style serial tally interface.
 
@@ -68,33 +68,35 @@ On the TS3019 tally box, set USB-C as the input interface and set the USB-C inte
 
 ## Companion trigger workflow
 
-For Blackmagic ATEM, the recommended workflow is now direct ATEM sync inside this TS3019 module. Enable `Enable direct ATEM sync`, set the ATEM IP address, and set `ATEM M/E` to the mix effect you want to follow.
+For Blackmagic ATEM, the recommended workflow is one Companion action driven by ATEM variables.
 
-Direct ATEM sync reads Program, Preview, and transition state from the ATEM and recalculates all TS3019 lamps as one complete state update:
+Use the `Sync all lamps from Program/Preview variables` action with expressions:
+
+- Program input ID: `$(atem:pgm1_input_id)`
+- Preview input ID: `$(atem:pvw1_input_id)`
+- Transition active: `$(atem:tbar_1) > 0`
+
+The action recalculates all TS3019 lamps as one complete state update:
 
 - Program input N -> Lamp N red
 - Preview input N -> Lamp N green
 - During fade/mix transition, Preview input N also becomes red
 - After CUT or transition completion, all lamps are normalized from current ATEM Program/Preview state
 
-This avoids race conditions from multiple independent Companion triggers.
+This avoids race conditions from multiple independent Companion triggers changing individual lamps.
 
-The trigger workflow below is kept as a portable fallback.
-
-Create triggers from your switcher module, such as Blackmagic ATEM, and call this module's `Set lamp state` action.
+Create triggers from your switcher module, such as Blackmagic ATEM, and call this module's sync action.
 
 For simple one-at-a-time tally updates, use `Exclusive` mode:
 
 - Program input 1 -> Lamp 1 Program, Exclusive
 - Preview input 2 -> Lamp 2 Preview, Exclusive
 
-For ATEM tally on ME1, use direct ATEM `Program`, `Preview`, and `Transition: Active/Running` feedbacks as trigger conditions for each input/lamp pair:
+For ATEM on ME1, use direct ATEM `Program`, `Preview`, and `Transition: Active/Running` feedbacks only as trigger conditions. Each trigger should call `Sync all lamps from Program/Preview variables`; it should not set one lamp directly.
 
-- Program input N becomes true -> Lamp N Program, Additive / transition
-- Program input N becomes false -> Lamp N Clear Program only, Additive / transition
-- Preview input N becomes true -> Lamp N Preview, Additive / transition
-- Preview input N becomes false -> Lamp N Clear Preview only, Additive / transition
-- Preview input N is true and Transition is running -> Lamp N Program, Additive / transition
+- Program input N changes -> Sync all lamps
+- Preview input N changes -> Sync all lamps
+- Transition starts/stops -> Sync all lamps
 
 This allows two red program lamps during fades or mix transitions. At the end of the transition, ATEM Program/Preview changes normalize the lamp states. If a lamp is both Program and Preview, the red output has priority over green on the physical TS3019 output.
 
