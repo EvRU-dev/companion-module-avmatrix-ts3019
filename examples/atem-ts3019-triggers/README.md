@@ -2,16 +2,15 @@
 
 This example imports a complete Bitfocus Companion v4 trigger collection for controlling AVMATRIX TS3019 tally lamps from a Blackmagic ATEM connection.
 
-It creates 72 triggers for the default 12-lamp setup:
+It creates 60 triggers for the default 12-lamp setup:
 
 - ATEM input 1-12 Program on -> TS3019 lamp 1-12 Program
 - ATEM input 1-12 Program off -> TS3019 lamp 1-12 Clear Program only
 - ATEM input 1-12 Preview on -> TS3019 lamp 1-12 Preview
 - ATEM input 1-12 Preview off -> TS3019 lamp 1-12 Clear Preview only
 - ATEM input 1-12 Preview on + Transition running -> TS3019 lamp 1-12 temporary Program
-- ATEM input 1-12 Preview on + Transition not running -> TS3019 lamp 1-12 Clear Program only
 
-The TS3019 module should be version `0.1.0-beta.8` or newer. Version `0.1.0-beta.8` packages the serial dependency needed for imported module packages on Windows, macOS, Linux, and Raspberry Pi.
+The TS3019 module should be version `0.1.0-beta.9` or newer. Version `0.1.0-beta.9` packages the serial dependency needed for imported module packages on Windows, macOS, Linux, and Raspberry Pi.
 
 ## Requirements
 

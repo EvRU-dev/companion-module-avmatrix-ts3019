@@ -250,7 +250,7 @@ async function main() {
 	console.log(`ATEM connection: ${args.atemLabel} (${atemId})`)
 	console.log(`TS3019 connection: ${args.ts3019Label} (${ts3019Id})`)
 	console.log(`Collection: ${args.collectionLabel}`)
-	console.log(`Triggers to create: ${args.lampCount * 6}`)
+	console.log(`Triggers to create: ${args.lampCount * 5}`)
 
 	if (args.dryRun) {
 		if (previousCollectionIds.length)
@@ -318,14 +318,6 @@ async function main() {
 					{ feedbackId: 'inTransition', inputId, inverted: false },
 				],
 				'program',
-			],
-			[
-				`ATEM fade PVW ${inputId} idle -> L${lamp} clear temporary red`,
-				[
-					{ feedbackId: 'preview', inputId, inverted: false },
-					{ feedbackId: 'inTransition', inputId, inverted: true },
-				],
-				'clear_program',
 			],
 		]
 

@@ -2,7 +2,7 @@
 
 Bitfocus Companion module for controlling AVMATRIX TS3019 tally lamps through the tally box USB-C serial port.
 
-Current status: beta (`0.1.0-beta.8`).
+Current status: beta (`0.1.0-beta.9`).
 
 The first implementation targets the TS3019 vMix-compatible USB mode, which appears to expose an Arduino/Firmata-style serial tally interface.
 
@@ -82,9 +82,8 @@ For ATEM tally on ME1, use direct ATEM `Program`, `Preview`, and `Transition: Ac
 - Preview input N becomes true -> Lamp N Preview, Additive / transition
 - Preview input N becomes false -> Lamp N Clear Preview only, Additive / transition
 - Preview input N is true and Transition is running -> Lamp N Program, Additive / transition
-- Preview input N is true and Transition is not running -> Lamp N Clear Program only, Additive / transition
 
-This allows two red program lamps during fades or mix transitions while clearing the temporary Program flag after the transition. If a lamp is both Program and Preview, the red output has priority over green on the physical TS3019 output.
+This allows two red program lamps during fades or mix transitions. At the end of the transition, ATEM Program/Preview changes normalize the lamp states. If a lamp is both Program and Preview, the red output has priority over green on the physical TS3019 output.
 
 ### Importable ATEM trigger example
 
