@@ -182,21 +182,32 @@ function makeAction(ts3019Id, lamp, state) {
 }
 
 function makeCondition(atemId, feedbackId, inputId, inverted) {
+	const options =
+		feedbackId === 'inTransition'
+			? {
+					mixeffect: expr(1),
+				}
+			: {
+					mixeffect: expr(1),
+					input: expr(inputId),
+				}
+
 	return {
 		id: makeId(),
 		definitionId: feedbackId,
 		connectionId: atemId,
-		options: {
-			input: expr(inputId),
-		},
+		options,
 		type: 'feedback',
-		style: { color: 16777215, bgcolor: feedbackId === 'program_tally' ? 16711680 : 65280 },
+		style: {
+			color: 16777215,
+			bgcolor: feedbackId === 'program' || feedbackId === 'inTransition' ? 16711680 : 65280,
+		},
 		isInverted: expr(inverted),
 		children: {},
 	}
 }
 
-function makeTrigger(collectionId, ts3019Id, atemId, name, sortOrder, feedbackId, inputId, inverted, lamp, state) {
+function makeTrigger(collectionId, ts3019Id, atemId, name, sortOrder, conditions, lamp, state) {
 	return {
 		type: 'trigger',
 		options: {
@@ -206,7 +217,9 @@ function makeTrigger(collectionId, ts3019Id, atemId, name, sortOrder, feedbackId
 			collectionId,
 		},
 		actions: [makeAction(ts3019Id, lamp, state)],
-		condition: [makeCondition(atemId, feedbackId, inputId, inverted)],
+		condition: conditions.map(({ feedbackId, inputId, inverted }) =>
+			makeCondition(atemId, feedbackId, inputId, inverted),
+		),
 		events: [{ id: makeId(), type: 'condition_true', enabled: true, options: {} }],
 		localVariables: [],
 	}
@@ -237,7 +250,7 @@ async function main() {
 	console.log(`ATEM connection: ${args.atemLabel} (${atemId})`)
 	console.log(`TS3019 connection: ${args.ts3019Label} (${ts3019Id})`)
 	console.log(`Collection: ${args.collectionLabel}`)
-	console.log(`Triggers to create: ${args.lampCount * 4}`)
+	console.log(`Triggers to create: ${args.lampCount * 6}`)
 
 	if (args.dryRun) {
 		if (previousCollectionIds.length)
@@ -278,18 +291,50 @@ async function main() {
 	for (let lamp = 1; lamp <= args.lampCount; lamp++) {
 		const inputId = lamp
 		const specs = [
-			[`ATEM PGM ${inputId} -> L${lamp} red`, 'program_tally', false, 'program'],
-			[`ATEM PGM ${inputId} off -> L${lamp} clear red`, 'program_tally', true, 'clear_program'],
-			[`ATEM PVW ${inputId} -> L${lamp} green`, 'preview_tally', false, 'preview'],
-			[`ATEM PVW ${inputId} off -> L${lamp} clear green`, 'preview_tally', true, 'clear_preview'],
+			[
+				`ATEM PGM ${inputId} -> L${lamp} red`,
+				[{ feedbackId: 'program', inputId, inverted: false }],
+				'program',
+			],
+			[
+				`ATEM PGM ${inputId} off -> L${lamp} clear red`,
+				[{ feedbackId: 'program', inputId, inverted: true }],
+				'clear_program',
+			],
+			[
+				`ATEM PVW ${inputId} -> L${lamp} green`,
+				[{ feedbackId: 'preview', inputId, inverted: false }],
+				'preview',
+			],
+			[
+				`ATEM PVW ${inputId} off -> L${lamp} clear green`,
+				[{ feedbackId: 'preview', inputId, inverted: true }],
+				'clear_preview',
+			],
+			[
+				`ATEM fade PVW ${inputId} -> L${lamp} temporary red`,
+				[
+					{ feedbackId: 'preview', inputId, inverted: false },
+					{ feedbackId: 'inTransition', inputId, inverted: false },
+				],
+				'program',
+			],
+			[
+				`ATEM fade PVW ${inputId} idle -> L${lamp} clear temporary red`,
+				[
+					{ feedbackId: 'preview', inputId, inverted: false },
+					{ feedbackId: 'inTransition', inputId, inverted: true },
+				],
+				'clear_program',
+			],
 		]
 
-		for (const [name, feedbackId, inverted, state] of specs) {
+		for (const [name, conditions, state] of specs) {
 			saveJson(
 				db,
 				'controls',
 				`trigger:${makeId()}`,
-				makeTrigger(collectionId, ts3019Id, atemId, name, sortOrder, feedbackId, inputId, inverted, lamp, state),
+				makeTrigger(collectionId, ts3019Id, atemId, name, sortOrder, conditions, lamp, state),
 			)
 			sortOrder += 1
 			created += 1

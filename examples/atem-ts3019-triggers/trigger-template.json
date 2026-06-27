@@ -5,7 +5,7 @@
 		"companion": "v4",
 		"atemModuleId": "bmd-atem",
 		"ts3019ModuleId": "avmatrix-ts3019",
-		"ts3019Version": "0.1.0-beta.7 or newer"
+		"ts3019Version": "0.1.0-beta.8 or newer"
 	},
 	"defaultLabels": {
 		"atem": "atem",
@@ -16,20 +16,28 @@
 		"lampCount": 12,
 		"triggersPerLamp": [
 			{
-				"condition": "ATEM Tally: Program for input N becomes true",
+				"condition": "ATEM ME1 Program source for input N becomes true",
 				"action": "TS3019 Set lamp state, lamp N, Program, Additive / transition"
 			},
 			{
-				"condition": "ATEM Tally: Program for input N becomes false",
+				"condition": "ATEM ME1 Program source for input N becomes false",
 				"action": "TS3019 Set lamp state, lamp N, Clear Program only, Additive / transition"
 			},
 			{
-				"condition": "ATEM Tally: Preview for input N becomes true",
+				"condition": "ATEM ME1 Preview source for input N becomes true",
 				"action": "TS3019 Set lamp state, lamp N, Preview, Additive / transition"
 			},
 			{
-				"condition": "ATEM Tally: Preview for input N becomes false",
+				"condition": "ATEM ME1 Preview source for input N becomes false",
 				"action": "TS3019 Set lamp state, lamp N, Clear Preview only, Additive / transition"
+			},
+			{
+				"condition": "ATEM ME1 Preview source for input N is true and Transition: Active/Running is true",
+				"action": "TS3019 Set lamp state, lamp N, Program, Additive / transition"
+			},
+			{
+				"condition": "ATEM ME1 Preview source for input N is true and Transition: Active/Running is false",
+				"action": "TS3019 Set lamp state, lamp N, Clear Program only, Additive / transition"
 			}
 		]
 	}

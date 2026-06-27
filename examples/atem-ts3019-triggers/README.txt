@@ -8,16 +8,17 @@ ATEM input 2 -> TS3019 lamp 2
 ...
 ATEM input 12 -> TS3019 lamp 12
 
-For every input/lamp pair it creates Program and Preview triggers, including
-separate "clear red" and "clear green" triggers. This allows two red lights
-during ATEM fade/mix transitions.
+For every input/lamp pair it creates Program, Preview, and Transition triggers,
+including separate "clear red" and "clear green" triggers. During an ATEM
+fade/mix transition, the Preview input is temporarily promoted to red so both
+sources can show Program tally while they are both visible.
 
 
 What to install first
 ---------------------
 
 1. Install the AVMATRIX TS3019 module package in Companion:
-   avmatrix-ts3019-0.1.0-beta.7.tgz
+   avmatrix-ts3019-0.1.0-beta.8.tgz
 
 2. In Companion, create/configure these connections:
    - ATEM connection label: atem
@@ -98,6 +99,14 @@ What changes will it make?
 
 The importer creates or replaces one trigger collection:
   ATEM to TS3019
+
+It creates 6 triggers per mapped input/lamp:
+  Program true -> red
+  Program false -> clear red
+  Preview true -> green
+  Preview false -> clear green
+  Preview true + Transition running -> temporary red
+  Preview true + Transition not running -> clear temporary red
 
 It makes a backup of db.sqlite before writing changes.
 

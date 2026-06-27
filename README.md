@@ -2,7 +2,7 @@
 
 Bitfocus Companion module for controlling AVMATRIX TS3019 tally lamps through the tally box USB-C serial port.
 
-Current status: beta (`0.1.0-beta.7`).
+Current status: beta (`0.1.0-beta.8`).
 
 The first implementation targets the TS3019 vMix-compatible USB mode, which appears to expose an Arduino/Firmata-style serial tally interface.
 
@@ -75,14 +75,16 @@ For simple one-at-a-time tally updates, use `Exclusive` mode:
 - Program input 1 -> Lamp 1 Program, Exclusive
 - Preview input 2 -> Lamp 2 Preview, Exclusive
 
-For ATEM tally, use the ATEM `Tally: Program` and `Tally: Preview` feedbacks as trigger conditions for each input/lamp pair:
+For ATEM tally on ME1, use direct ATEM `Program`, `Preview`, and `Transition: Active/Running` feedbacks as trigger conditions for each input/lamp pair:
 
-- Program tally becomes true -> Lamp N Program, Additive / transition
-- Program tally becomes false -> Lamp N Clear Program only, Additive / transition
-- Preview tally becomes true -> Lamp N Preview, Additive / transition
-- Preview tally becomes false -> Lamp N Clear Preview only, Additive / transition
+- Program input N becomes true -> Lamp N Program, Additive / transition
+- Program input N becomes false -> Lamp N Clear Program only, Additive / transition
+- Preview input N becomes true -> Lamp N Preview, Additive / transition
+- Preview input N becomes false -> Lamp N Clear Preview only, Additive / transition
+- Preview input N is true and Transition is running -> Lamp N Program, Additive / transition
+- Preview input N is true and Transition is not running -> Lamp N Clear Program only, Additive / transition
 
-This allows two red program lamps during fades or mix transitions while clearing the old Program lamp when ATEM reports that it is no longer on air. If a lamp is both Program and Preview, the red output has priority over green on the physical TS3019 output.
+This allows two red program lamps during fades or mix transitions while clearing the temporary Program flag after the transition. If a lamp is both Program and Preview, the red output has priority over green on the physical TS3019 output.
 
 ### Importable ATEM trigger example
 
